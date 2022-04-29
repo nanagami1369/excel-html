@@ -1,0 +1,24 @@
+* {
+    margin: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+.top-header {
+    background-color: #007a3d;
+    color: #eee;
+    height: 50px;
+}
+
+.top-header h1 {
+    margin-left: 15px;
+}
+
+main {
+    height: calc(100% - 50px);
+    display: block;
+}

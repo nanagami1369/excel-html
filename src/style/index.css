@@ -1,0 +1,61 @@
+.top-header {
+    height: 50px;
+    margin-bottom: 1rem;
+}
+
+main {
+    height: calc(100% - (50px + 1rem));
+    overflow: scroll;
+}
+
+.table {
+    border-collapse: collapse;
+    margin: 0px 5px;
+}
+
+.table thead th {
+    position: sticky;
+    top: 0;
+}
+
+table thead th::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block;
+    height: 100%;
+    width: 100%;
+    margin-left: -1px;
+    border-left: solid 1px gray;
+    border-top: solid 1px gray;
+    border-bottom: solid 1px gray;
+    pointer-events: none;
+}
+table thead th::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block;
+    margin-top: 1px;
+    height: 100%;
+    width: calc(100% - 1px);
+    border-right: solid 1px gray;
+    pointer-events: none;
+}
+
+.table :where(th, td) {
+    min-width: 8em;
+    width: auto;
+    white-space: nowrap;
+    background-color: #fff;
+}
+
+.table td {
+    border: solid 1px gray;
+}
+
+.focus-table-row td {
+    background-color: #80f0ca;
+}
