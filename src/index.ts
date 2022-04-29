@@ -20,6 +20,14 @@ class FocusManager {
         this.#value.push(target)
     }
 
+    #focusAll(event: Event): void {
+        this.#unFocusAll()
+        Array.from(this.#table.rows)
+            .slice(1)
+            .forEach((tableRows) => this.#focus(tableRows))
+        event.preventDefault()
+    }
+
     #unFocus(target: HTMLTableRowElement): void {
         const findIndex = this.#value.findIndex((tableRow) => tableRow.isEqualNode(target))
         if (findIndex === -1) {
@@ -142,6 +150,11 @@ class FocusManager {
                             this.#moveFarUp(event)
                         } else {
                             this.#moveUp(event)
+                        }
+                        break
+                    case 'a':
+                        if (event.ctrlKey) {
+                            this.#focusAll(event)
                         }
                         break
                     default:
