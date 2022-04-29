@@ -6,6 +6,12 @@ class FocusManager {
 
     #FocusTableRowClassName: Readonly<string> = 'focus-table-row'
 
+    #tableViewer: HTMLElement
+
+    constructor(tableViewer: HTMLElement) {
+        this.#tableViewer = tableViewer
+    }
+
     #focus(target: HTMLTableRowElement): void {
         target.classList.add(this.#FocusTableRowClassName)
         this.#value.push(target)
@@ -25,8 +31,56 @@ class FocusManager {
         this.#value.splice(0)
     }
 
+    #moveDown(event: KeyboardEvent) {
+        // フォーカスが当たっている要素がなければ終了
+        if (this.#value.length === 0) {
+            return
+        }
+        const nextTableRow = this.#value[0].nextElementSibling
+        // 次のテーブル行がなければ終了
+        if (!(nextTableRow instanceof HTMLTableRowElement)) {
+            return
+        }
+        this.#unFocusAll()
+        this.#focus(nextTableRow)
+        // スクロール位置を調整
+        const bottom =
+            this.#tableViewer.offsetTop + this.#tableViewer.offsetHeight - nextTableRow.offsetHeight
+        const currentBottom = Math.trunc(nextTableRow.getBoundingClientRect().bottom)
+        if (currentBottom > bottom) {
+            this.#tableViewer.scrollBy({
+                top: currentBottom - bottom,
+            })
+        }
+        event.preventDefault()
+    }
+
+    #moveUp(event: KeyboardEvent) {
+        // フォーカスが当たっている要素がなければ終了
+        if (this.#value.length === 0) {
+            return
+        }
+        const previousTableRow = this.#value[0].previousElementSibling
+        // 次のテーブル行がなければ終了
+        if (!(previousTableRow instanceof HTMLTableRowElement)) {
+            return
+        }
+        this.#unFocusAll()
+        this.#focus(previousTableRow)
+        // スクロール位置を調整
+        const top = this.#tableViewer.offsetTop + previousTableRow.offsetHeight
+        const currentTop = Math.trunc(previousTableRow.getBoundingClientRect().top)
+        if (currentTop <= top) {
+            this.#tableViewer.scrollBy({ top: currentTop - top })
+        }
+        event.preventDefault()
+    }
+
     // EventHandler
-    public get eventHandlers(): { tableMouseDown: (event: Event) => void } {
+    public get eventHandlers(): {
+        tableMouseDown: (event: Event) => void
+        tableKeyDown: (event: KeyboardEvent) => void
+    } {
         return {
             tableMouseDown: (event: Event): void => {
                 let target = event.target
@@ -39,6 +93,19 @@ class FocusManager {
                 }
                 this.#unFocusAll()
                 this.#focus(target)
+            },
+            tableKeyDown: (event: KeyboardEvent) => {
+                switch (event.key) {
+                    case 'ArrowDown':
+                        this.#moveDown(event)
+                        break
+                    case 'ArrowUp':
+                        this.#moveUp(event)
+                        break
+                    default:
+                        console.log(event)
+                        break
+                }
             },
         }
     }
@@ -58,14 +125,21 @@ const setup = (): void => {
     }
     const tbody = document.querySelector('.table tbody')
     for (let index = 0; index < 50; index++) {
-        tbody?.insertAdjacentElement('beforebegin', testTemplate1.cloneNode(true) as HTMLElement)
-        tbody?.insertAdjacentElement('beforebegin', testTemplate2.cloneNode(true) as HTMLElement)
+        tbody?.insertAdjacentElement('beforeend', testTemplate1.cloneNode(true) as HTMLElement)
+        tbody?.insertAdjacentElement('beforeend', testTemplate2.cloneNode(true) as HTMLElement)
     }
     // イベントの登録
-    const focusManager = new FocusManager()
+    const main = document.querySelector('main')
+    if (main == null) {
+        throw new Error('main Element is null')
+    }
+    const focusManager = new FocusManager(main)
     document
         .querySelector('.table')
         ?.addEventListener('mousedown', focusManager.eventHandlers.tableMouseDown)
+    document.addEventListener('keydown', focusManager.eventHandlers.tableKeyDown, {
+        passive: false,
+    })
 }
 
 window.addEventListener('DOMContentLoaded', setup)
