@@ -8,8 +8,11 @@ class FocusManager {
 
     #tableViewer: HTMLElement
 
-    constructor(tableViewer: HTMLElement) {
+    #table: HTMLTableElement
+
+    constructor(tableViewer: HTMLElement, table: HTMLTableElement) {
         this.#tableViewer = tableViewer
+        this.#table = table
     }
 
     #focus(target: HTMLTableRowElement): void {
@@ -76,6 +79,37 @@ class FocusManager {
         event.preventDefault()
     }
 
+    #moveFarDown(event: KeyboardEvent) {
+        // フォーカスが当たっている要素がなければ終了
+        if (this.#value.length === 0) {
+            return
+        }
+        this.#unFocusAll()
+        const rows = this.#table.rows
+        const LastTableRowsIndex = rows.length - 1
+        this.#focus(rows[LastTableRowsIndex])
+        // スクロール位置を調整
+        // 最も下までスクロール
+        this.#tableViewer.scrollTo({ top: this.#tableViewer.scrollHeight })
+        event.preventDefault()
+    }
+
+    #moveFarUp(event: KeyboardEvent) {
+        // フォーカスが当たっている要素がなければ終了
+        if (this.#value.length === 0) {
+            return
+        }
+        this.#unFocusAll()
+        console.log(this.#table.rows[0])
+        const rows = this.#table.rows
+        const FirstTableRowsIndex = 1
+        this.#focus(rows[FirstTableRowsIndex])
+        // スクロール位置を調整
+        // 最も上までスクロール
+        this.#tableViewer.scrollTo({ top: 0 })
+        event.preventDefault()
+    }
+
     // EventHandler
     public get eventHandlers(): {
         tableMouseDown: (event: Event) => void
@@ -97,10 +131,18 @@ class FocusManager {
             tableKeyDown: (event: KeyboardEvent) => {
                 switch (event.key) {
                     case 'ArrowDown':
-                        this.#moveDown(event)
+                        if (event.ctrlKey) {
+                            this.#moveFarDown(event)
+                        } else {
+                            this.#moveDown(event)
+                        }
                         break
                     case 'ArrowUp':
-                        this.#moveUp(event)
+                        if (event.ctrlKey) {
+                            this.#moveFarUp(event)
+                        } else {
+                            this.#moveUp(event)
+                        }
                         break
                     default:
                         console.log(event)
@@ -133,7 +175,11 @@ const setup = (): void => {
     if (main == null) {
         throw new Error('main Element is null')
     }
-    const focusManager = new FocusManager(main)
+    const table = document.querySelector('.table')
+    if (!(table instanceof HTMLTableElement)) {
+        throw new Error('not found table Element ')
+    }
+    const focusManager = new FocusManager(main, table)
     document
         .querySelector('.table')
         ?.addEventListener('mousedown', focusManager.eventHandlers.tableMouseDown)
