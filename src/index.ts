@@ -180,10 +180,8 @@ const setup = (): void => {
         throw new Error('not found table Element ')
     }
     const focusManager = new FocusManager(main, table)
-    document
-        .querySelector('.table')
-        ?.addEventListener('mousedown', focusManager.eventHandlers.tableMouseDown)
-    document.addEventListener('keydown', focusManager.eventHandlers.tableKeyDown, {
+    table.addEventListener('mousedown', focusManager.eventHandlers.tableMouseDown)
+    table.addEventListener('keydown', focusManager.eventHandlers.tableKeyDown, {
         passive: false,
     })
 }
