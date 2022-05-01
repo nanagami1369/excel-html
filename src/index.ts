@@ -13,6 +13,15 @@ class FocusManager {
     constructor(tableViewer: HTMLElement, table: HTMLTableElement) {
         this.#tableViewer = tableViewer
         this.#table = table
+
+        // すぐにアクセスできるようにテーブルにフォーカスを当てる
+        this.#tableViewer.focus()
+        //アクセス時に最初の要素にフォーカスを当てる
+        const firstTableRow = this.#table.querySelector('tbody tr:first-child')
+        if (!(firstTableRow instanceof HTMLTableRowElement)) {
+            return
+        }
+        this.#focus(firstTableRow)
     }
 
     #focus(target: HTMLTableRowElement): void {
