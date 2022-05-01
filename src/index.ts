@@ -28,13 +28,9 @@ class FocusManager {
         event.preventDefault()
     }
 
-    #unFocus(target: HTMLTableRowElement): void {
-        const findIndex = this.#value.findIndex((tableRow) => tableRow.isEqualNode(target))
-        if (findIndex === -1) {
-            return
-        }
-        this.#value[findIndex].classList.remove(this.#FocusTableRowClassName)
-        this.#value.splice(findIndex, 1)
+    #unFocus(focusTableRowIndex: number): void {
+        this.#value[focusTableRowIndex].classList.remove(this.#FocusTableRowClassName)
+        this.#value.splice(focusTableRowIndex, 1)
     }
 
     #unFocusAll(): void {
@@ -129,8 +125,13 @@ class FocusManager {
         if (!(nextTableRow instanceof HTMLTableRowElement)) {
             return
         }
-        this.#focus(nextTableRow)
-        console.log(this.#value)
+        const firstTableRowIndex = 0
+        const firstTableRow = this.#value[firstTableRowIndex]
+        if (nextTableRow.offsetTop > firstTableRow.offsetTop) {
+            this.#focus(nextTableRow)
+        } else {
+            this.#unFocus(currentTableRowIndex)
+        }
 
         // スクロール位置を調整
         const bottom =
@@ -156,8 +157,14 @@ class FocusManager {
         if (!(previousTableRow instanceof HTMLTableRowElement)) {
             return
         }
-        this.#focus(previousTableRow)
-        console.log(this.#value)
+        const firstTableRowIndex = 0
+        const firstTableRow = this.#value[firstTableRowIndex]
+        if (previousTableRow.offsetTop < firstTableRow.offsetTop) {
+            this.#focus(previousTableRow)
+        } else {
+            this.#unFocus(currentTableRowIndex)
+        }
+
         // スクロール位置を調整
         const top = this.#tableViewer.offsetTop + previousTableRow.offsetHeight
         const currentTop = Math.trunc(previousTableRow.getBoundingClientRect().top)
