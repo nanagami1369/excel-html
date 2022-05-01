@@ -21,11 +21,23 @@ class FocusManager {
         // すぐに操作できるようにテーブルにフォーカスを当てる
         this.#tableViewer.focus()
         //アクセス時に最初の要素にフォーカスを当てる
-        const firstTableRow = this.#table.querySelector('tbody tr:first-child')
+        const firstTableRow = this.#getFirstTableRow()
         if (!(firstTableRow instanceof HTMLTableRowElement)) {
             return
         }
         this.#focus(firstTableRow)
+    }
+
+    #getFirstTableRow(): HTMLTableRowElement | null {
+        return this.#table.querySelector('tbody tr:first-child')
+    }
+
+    #getLastTableRow(): HTMLTableRowElement | null {
+        return this.#table.querySelector('tbody tr:last-child')
+    }
+
+    #getTableRowAll(): NodeListOf<HTMLTableRowElement> | null {
+        return this.#table.querySelectorAll('tbody tr')
     }
 
     #focus(target: HTMLTableRowElement): void {
@@ -35,9 +47,7 @@ class FocusManager {
 
     #focusAll(event: Event): void {
         this.#unFocusAll()
-        Array.from(this.#table.rows)
-            .slice(1)
-            .forEach((tableRows) => this.#focus(tableRows))
+        this.#getTableRowAll()?.forEach((tableRows) => this.#focus(tableRows))
         event.preventDefault()
     }
 
@@ -102,10 +112,13 @@ class FocusManager {
         if (this.#value.length === 0) {
             return
         }
+        const lastTableRow = this.#getLastTableRow()
+        // 最後の要素がなければ終了
+        if (!(lastTableRow instanceof HTMLTableRowElement)) {
+            return
+        }
         this.#unFocusAll()
-        const rows = this.#table.rows
-        const LastTableRowsIndex = rows.length - 1
-        this.#focus(rows[LastTableRowsIndex])
+        this.#focus(lastTableRow)
         // スクロール位置を調整
         // 最も下までスクロール
         this.#tableViewer.scrollTo({ top: this.#tableViewer.scrollHeight })
@@ -117,11 +130,13 @@ class FocusManager {
         if (this.#value.length === 0) {
             return
         }
+        const firstTableRow = this.#getFirstTableRow()
+        // 最初の要素が無ければ終了
+        if (!(firstTableRow instanceof HTMLTableRowElement)) {
+            return
+        }
         this.#unFocusAll()
-        console.log(this.#table.rows[0])
-        const rows = this.#table.rows
-        const FirstTableRowsIndex = 1
-        this.#focus(rows[FirstTableRowsIndex])
+        this.#focus(firstTableRow)
         // スクロール位置を調整
         // 最も上までスクロール
         this.#tableViewer.scrollTo({ top: 0 })
