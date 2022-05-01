@@ -186,7 +186,7 @@ class FocusManager {
         // 初期値から最も下までのテーブル行を取得
         firstTableRow.classList.add(rangeStartPointClassName)
         const rangeTableRows = Array.from(
-            document.querySelectorAll(`.table tbody .${rangeStartPointClassName} ~ tr`)
+            this.#table.querySelectorAll(`tbody .${rangeStartPointClassName} ~ tr`)
         ) as HTMLTableRowElement[]
         rangeTableRows.unshift(firstTableRow)
         firstTableRow.classList.remove(rangeStartPointClassName)
@@ -212,7 +212,7 @@ class FocusManager {
         // 初期値から最も上までのテーブル行を取得
         firstTableRow.classList.add(rangeStartPointClassName)
         const rangeTableRows = Array.from(
-            document.querySelectorAll(`.table tbody tr:not(.${rangeStartPointClassName} ~ tr)`)
+            this.#table.querySelectorAll(`tbody tr:not(.${rangeStartPointClassName} ~ tr)`)
         ) as HTMLTableRowElement[]
         firstTableRow.classList.remove(rangeStartPointClassName)
         // moveRangeUpと同じように配列に追加されるように調整
