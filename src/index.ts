@@ -4,17 +4,21 @@ import './style/index.css'
 class FocusManager {
     #value: HTMLTableRowElement[] = []
 
+    // フォーカスが当たっている要素につけるクラス名
     #FocusTableRowClassName: Readonly<string> = 'focus-table-row'
 
+    // テーブルをスクロールできる親要素
+    // この要素の範囲内にフォーカスがあればテーブルを操作可能
     #tableViewer: HTMLElement
 
+    // テーブルそのもの
     #table: HTMLTableElement
 
     constructor(tableViewer: HTMLElement, table: HTMLTableElement) {
         this.#tableViewer = tableViewer
         this.#table = table
 
-        // すぐにアクセスできるようにテーブルにフォーカスを当てる
+        // すぐに操作できるようにテーブルにフォーカスを当てる
         this.#tableViewer.focus()
         //アクセス時に最初の要素にフォーカスを当てる
         const firstTableRow = this.#table.querySelector('tbody tr:first-child')
