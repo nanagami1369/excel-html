@@ -118,6 +118,56 @@ class FocusManager {
         event.preventDefault()
     }
 
+    #moveRangeDown(event: KeyboardEvent) {
+        // フォーカスが当たっている要素がなければ終了
+        if (this.#value.length === 0) {
+            return
+        }
+        const currentTableRowIndex = this.#value.length - 1
+        const nextTableRow = this.#value[currentTableRowIndex].nextElementSibling
+        // 次のテーブル行がなければ終了
+        if (!(nextTableRow instanceof HTMLTableRowElement)) {
+            return
+        }
+        this.#focus(nextTableRow)
+        console.log(this.#value)
+
+        // スクロール位置を調整
+        const bottom =
+            this.#tableViewer.offsetTop + this.#tableViewer.offsetHeight - nextTableRow.offsetHeight
+        const currentBottom = Math.trunc(nextTableRow.getBoundingClientRect().bottom)
+        if (currentBottom > bottom) {
+            this.#tableViewer.scrollBy({
+                top: currentBottom - bottom,
+            })
+        }
+        event.preventDefault()
+    }
+
+    #moveRangeUp(event: KeyboardEvent) {
+        // フォーカスが当たっている要素がなければ終了
+        if (this.#value.length === 0) {
+            return
+        }
+        const currentTableRowIndex = this.#value.length - 1
+        const previousTableRow = this.#value[currentTableRowIndex].previousElementSibling
+
+        // 次のテーブル行がなければ終了
+        if (!(previousTableRow instanceof HTMLTableRowElement)) {
+            return
+        }
+        this.#focus(previousTableRow)
+        console.log(this.#value)
+        // スクロール位置を調整
+        const top = this.#tableViewer.offsetTop + previousTableRow.offsetHeight
+        const currentTop = Math.trunc(previousTableRow.getBoundingClientRect().top)
+        if (currentTop <= top) {
+            this.#tableViewer.scrollBy({ top: currentTop - top })
+        }
+
+        event.preventDefault()
+    }
+
     // EventHandler
     public get eventHandlers(): {
         tableMouseDown: (event: Event) => void
@@ -142,14 +192,22 @@ class FocusManager {
                         if (event.ctrlKey) {
                             this.#moveFarDown(event)
                         } else {
-                            this.#moveDown(event)
+                            if (event.shiftKey) {
+                                this.#moveRangeDown(event)
+                            } else {
+                                this.#moveDown(event)
+                            }
                         }
                         break
                     case 'ArrowUp':
                         if (event.ctrlKey) {
                             this.#moveFarUp(event)
                         } else {
-                            this.#moveUp(event)
+                            if (event.shiftKey) {
+                                this.#moveRangeUp(event)
+                            } else {
+                                this.#moveUp(event)
+                            }
                         }
                         break
                     case 'a':
