@@ -39,6 +39,7 @@ class FocusManager {
     }
 
     #moveDown(event: KeyboardEvent) {
+        event.preventDefault()
         // フォーカスが当たっている要素がなければ終了
         if (this.#value.length === 0) {
             return
@@ -59,10 +60,10 @@ class FocusManager {
                 top: currentBottom - bottom,
             })
         }
-        event.preventDefault()
     }
 
     #moveUp(event: KeyboardEvent) {
+        event.preventDefault()
         // フォーカスが当たっている要素がなければ終了
         if (this.#value.length === 0) {
             return
@@ -80,10 +81,10 @@ class FocusManager {
         if (currentTop <= top) {
             this.#tableViewer.scrollBy({ top: currentTop - top })
         }
-        event.preventDefault()
     }
 
     #moveFarDown(event: KeyboardEvent) {
+        event.preventDefault()
         // フォーカスが当たっている要素がなければ終了
         if (this.#value.length === 0) {
             return
@@ -95,10 +96,10 @@ class FocusManager {
         // スクロール位置を調整
         // 最も下までスクロール
         this.#tableViewer.scrollTo({ top: this.#tableViewer.scrollHeight })
-        event.preventDefault()
     }
 
     #moveFarUp(event: KeyboardEvent) {
+        event.preventDefault()
         // フォーカスが当たっている要素がなければ終了
         if (this.#value.length === 0) {
             return
@@ -111,10 +112,10 @@ class FocusManager {
         // スクロール位置を調整
         // 最も上までスクロール
         this.#tableViewer.scrollTo({ top: 0 })
-        event.preventDefault()
     }
 
     #moveRangeDown(event: KeyboardEvent) {
+        event.preventDefault()
         // フォーカスが当たっている要素がなければ終了
         if (this.#value.length === 0) {
             return
@@ -142,10 +143,10 @@ class FocusManager {
                 top: currentBottom - bottom,
             })
         }
-        event.preventDefault()
     }
 
     #moveRangeUp(event: KeyboardEvent) {
+        event.preventDefault()
         // フォーカスが当たっている要素がなければ終了
         if (this.#value.length === 0) {
             return
@@ -171,11 +172,10 @@ class FocusManager {
         if (currentTop <= top) {
             this.#tableViewer.scrollBy({ top: currentTop - top })
         }
-
-        event.preventDefault()
     }
 
     #moveRangeFarDown(event: KeyboardEvent) {
+        event.preventDefault()
         // フォーカスが当たっている要素がなければ終了
         if (this.#value.length === 0) {
             return
@@ -198,10 +198,10 @@ class FocusManager {
         // スクロール位置を調整
         // 最も下までスクロール
         this.#tableViewer.scrollTo({ top: this.#tableViewer.scrollHeight })
-        event.preventDefault()
     }
 
     #moveRangeFarUp(event: KeyboardEvent) {
+        event.preventDefault()
         // フォーカスが当たっている要素がなければ終了
         if (this.#value.length === 0) {
             return
@@ -225,7 +225,6 @@ class FocusManager {
         // スクロール位置を調整
         // 最も上までスクロール
         this.#tableViewer.scrollTo({ top: 0 })
-        event.preventDefault()
     }
     // EventHandler
     public get eventHandlers(): {
