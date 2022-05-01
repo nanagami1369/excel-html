@@ -175,6 +175,58 @@ class FocusManager {
         event.preventDefault()
     }
 
+    #moveRangeFarDown(event: KeyboardEvent) {
+        // フォーカスが当たっている要素がなければ終了
+        if (this.#value.length === 0) {
+            return
+        }
+        const rangeStartPointClassName = 'range-start-point-range'
+        const firstTableRowIndex = 0
+        const firstTableRow = this.#value[firstTableRowIndex]
+        // 初期値から最も下までのテーブル行を取得
+        firstTableRow.classList.add(rangeStartPointClassName)
+        const rangeTableRows = Array.from(
+            document.querySelectorAll(`.table tbody .${rangeStartPointClassName} ~ tr`)
+        ) as HTMLTableRowElement[]
+        rangeTableRows.unshift(firstTableRow)
+        firstTableRow.classList.remove(rangeStartPointClassName)
+
+        //見つかったテーブル行にフォーカスを当てる
+        this.#unFocusAll()
+        rangeTableRows.forEach((tableRow) => this.#focus(tableRow))
+
+        // スクロール位置を調整
+        // 最も下までスクロール
+        this.#tableViewer.scrollTo({ top: this.#tableViewer.scrollHeight })
+        event.preventDefault()
+    }
+
+    #moveRangeFarUp(event: KeyboardEvent) {
+        // フォーカスが当たっている要素がなければ終了
+        if (this.#value.length === 0) {
+            return
+        }
+        const rangeStartPointClassName = 'range-start-point-range'
+        const firstTableRowIndex = 0
+        const firstTableRow = this.#value[firstTableRowIndex]
+        // 初期値から最も上までのテーブル行を取得
+        firstTableRow.classList.add(rangeStartPointClassName)
+        const rangeTableRows = Array.from(
+            document.querySelectorAll(`.table tbody tr:not(.${rangeStartPointClassName} ~ tr)`)
+        ) as HTMLTableRowElement[]
+        firstTableRow.classList.remove(rangeStartPointClassName)
+        // moveRangeUpと同じように配列に追加されるように調整
+        rangeTableRows.reverse()
+
+        //見つかったテーブル行にフォーカスを当てる
+        this.#unFocusAll()
+        rangeTableRows.forEach((tableRow) => this.#focus(tableRow))
+
+        // スクロール位置を調整
+        // 最も上までスクロール
+        this.#tableViewer.scrollTo({ top: 0 })
+        event.preventDefault()
+    }
     // EventHandler
     public get eventHandlers(): {
         tableMouseDown: (event: Event) => void
@@ -197,7 +249,11 @@ class FocusManager {
                 switch (event.key) {
                     case 'ArrowDown':
                         if (event.ctrlKey) {
-                            this.#moveFarDown(event)
+                            if (event.shiftKey) {
+                                this.#moveRangeFarDown(event)
+                            } else {
+                                this.#moveFarDown(event)
+                            }
                         } else {
                             if (event.shiftKey) {
                                 this.#moveRangeDown(event)
@@ -208,7 +264,11 @@ class FocusManager {
                         break
                     case 'ArrowUp':
                         if (event.ctrlKey) {
-                            this.#moveFarUp(event)
+                            if (event.shiftKey) {
+                                this.#moveRangeFarUp(event)
+                            } else {
+                                this.#moveFarUp(event)
+                            }
                         } else {
                             if (event.shiftKey) {
                                 this.#moveRangeUp(event)
