@@ -230,7 +230,6 @@ class FocusManager {
     public get eventHandlers(): {
         tableMouseDown: (event: Event) => void
         tableKeyDown: (event: KeyboardEvent) => void
-        tableViewFocus: (event: FocusEvent) => void
     } {
         return {
             tableMouseDown: (event: Event): void => {
@@ -287,20 +286,6 @@ class FocusManager {
                         break
                 }
             },
-            tableViewFocus: (event: FocusEvent): void => {
-                event.preventDefault()
-                // フォーカスが当たっている要素があれば終了
-                console.log(event, this.#value)
-                if (this.#value.length !== 0) {
-                    return
-                }
-                // 無ければ最初の要素にフォーカスを当てる
-                const firstTableRow = this.#table.querySelector('tbody tr:first-child')
-                if (!(firstTableRow instanceof HTMLTableRowElement)) {
-                    return
-                }
-                this.#focus(firstTableRow)
-            },
         }
     }
 }
@@ -337,7 +322,6 @@ const setup = (): void => {
     main.addEventListener('keydown', focusManager.eventHandlers.tableKeyDown, {
         passive: false,
     })
-    main.addEventListener('focusin', focusManager.eventHandlers.tableViewFocus, { passive: false })
 }
 
 window.addEventListener('DOMContentLoaded', setup)
