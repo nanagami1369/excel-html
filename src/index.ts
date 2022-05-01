@@ -332,8 +332,9 @@ const setup = (): void => {
         throw new Error('not found table Element ')
     }
     const focusManager = new FocusManager(main, table)
-    table.addEventListener('mousedown', focusManager.eventHandlers.tableMouseDown)
-    table.addEventListener('keydown', focusManager.eventHandlers.tableKeyDown, {
+
+    main.addEventListener('mousedown', focusManager.eventHandlers.tableMouseDown)
+    main.addEventListener('keydown', focusManager.eventHandlers.tableKeyDown, {
         passive: false,
     })
     main.addEventListener('focusin', focusManager.eventHandlers.tableViewFocus, { passive: false })
