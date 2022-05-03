@@ -307,7 +307,7 @@ class FocusManager {
                 // マウスで範囲選択した要素を入れる配列
                 const selectMouseRangeTableRow: HTMLTableRowElement[] = []
                 // マウスで範囲選択された要素につけるクラス名
-                const focusSelectMouseRangeClassName: Readonly<string> = 'focus-select-mouse-range'
+                const focusSelectMouseRangeClassName: string = 'focus-select-mouse-range'
                 // マウスで範囲選択する関数
                 const selectRange = (tableRow: HTMLTableRowElement) => {
                     tableRow.classList.add(focusSelectMouseRangeClassName)
