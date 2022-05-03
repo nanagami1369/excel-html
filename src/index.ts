@@ -61,13 +61,33 @@ class FocusManager {
         this.#value.splice(0)
     }
 
+    #getStandardTableRow(): HTMLTableRowElement | null {
+        if (this.#value.length === 0) {
+            return null
+        } else {
+            return this.#value[0]
+        }
+    }
+
+    #getCurrentTableRow(): HTMLTableRowElement | null {
+        if (this.#value.length === 0) {
+            return null
+        } else {
+            return this.#value[this.#value.length - 1]
+        }
+    }
+
+    #getCurrentTableRowIndex(): number | null {
+        if (this.#value.length === 0) {
+            return -1
+        } else {
+            return this.#value.length - 1
+        }
+    }
+
     #moveDown(event: KeyboardEvent) {
         event.preventDefault()
-        // フォーカスが当たっている要素がなければ終了
-        if (this.#value.length === 0) {
-            return
-        }
-        const nextTableRow = this.#value[0].nextElementSibling
+        const nextTableRow = this.#getCurrentTableRow()?.nextElementSibling
         // 次のテーブル行がなければ終了
         if (!(nextTableRow instanceof HTMLTableRowElement)) {
             return
@@ -87,11 +107,7 @@ class FocusManager {
 
     #moveUp(event: KeyboardEvent) {
         event.preventDefault()
-        // フォーカスが当たっている要素がなければ終了
-        if (this.#value.length === 0) {
-            return
-        }
-        const previousTableRow = this.#value[0].previousElementSibling
+        const previousTableRow = this.#getCurrentTableRow()?.previousElementSibling
         // 次のテーブル行がなければ終了
         if (!(previousTableRow instanceof HTMLTableRowElement)) {
             return
@@ -144,19 +160,18 @@ class FocusManager {
 
     #moveRangeDown(event: KeyboardEvent) {
         event.preventDefault()
-        // フォーカスが当たっている要素がなければ終了
-        if (this.#value.length === 0) {
-            return
-        }
-        const currentTableRowIndex = this.#value.length - 1
-        const nextTableRow = this.#value[currentTableRowIndex].nextElementSibling
+        const nextTableRow = this.#getCurrentTableRow()?.nextElementSibling
         // 次のテーブル行がなければ終了
         if (!(nextTableRow instanceof HTMLTableRowElement)) {
             return
         }
-        const firstTableRowIndex = 0
-        const firstTableRow = this.#value[firstTableRowIndex]
-        if (nextTableRow.offsetTop > firstTableRow.offsetTop) {
+        const standardTableRow = this.#getStandardTableRow()
+        const currentTableRowIndex = this.#getCurrentTableRowIndex()
+        // フォーカスが当たっている行が無ければ終了
+        if (standardTableRow == null || currentTableRowIndex == null) {
+            return
+        }
+        if (nextTableRow.offsetTop > standardTableRow.offsetTop) {
             this.#focus(nextTableRow)
         } else {
             this.#unFocus(currentTableRowIndex)
@@ -179,16 +194,19 @@ class FocusManager {
         if (this.#value.length === 0) {
             return
         }
-        const currentTableRowIndex = this.#value.length - 1
-        const previousTableRow = this.#value[currentTableRowIndex].previousElementSibling
+        const previousTableRow = this.#getCurrentTableRow()?.previousElementSibling
 
         // 次のテーブル行がなければ終了
         if (!(previousTableRow instanceof HTMLTableRowElement)) {
             return
         }
-        const firstTableRowIndex = 0
-        const firstTableRow = this.#value[firstTableRowIndex]
-        if (previousTableRow.offsetTop < firstTableRow.offsetTop) {
+        const standardTableRow = this.#getStandardTableRow()
+        const currentTableRowIndex = this.#getCurrentTableRowIndex()
+        // フォーカスが当たっている行が無ければ終了
+        if (standardTableRow == null || currentTableRowIndex == null) {
+            return
+        }
+        if (previousTableRow.offsetTop < standardTableRow.offsetTop) {
             this.#focus(previousTableRow)
         } else {
             this.#unFocus(currentTableRowIndex)
@@ -204,20 +222,20 @@ class FocusManager {
 
     #moveRangeFarDown(event: KeyboardEvent) {
         event.preventDefault()
+        const rangeStartPointClassName = 'range-start-point-range'
+        const standardTablerow = this.#getStandardTableRow()
         // フォーカスが当たっている要素がなければ終了
-        if (this.#value.length === 0) {
+        if (standardTablerow == null) {
             return
         }
-        const rangeStartPointClassName = 'range-start-point-range'
-        const firstTableRowIndex = 0
-        const firstTableRow = this.#value[firstTableRowIndex]
+
         // 初期値から最も下までのテーブル行を取得
-        firstTableRow.classList.add(rangeStartPointClassName)
+        standardTablerow.classList.add(rangeStartPointClassName)
         const rangeTableRows = Array.from(
             this.#table.querySelectorAll(`tbody .${rangeStartPointClassName} ~ tr`)
         ) as HTMLTableRowElement[]
-        rangeTableRows.unshift(firstTableRow)
-        firstTableRow.classList.remove(rangeStartPointClassName)
+        rangeTableRows.unshift(standardTablerow)
+        standardTablerow.classList.remove(rangeStartPointClassName)
 
         //見つかったテーブル行にフォーカスを当てる
         this.#unFocusAll()
@@ -230,19 +248,19 @@ class FocusManager {
 
     #moveRangeFarUp(event: KeyboardEvent) {
         event.preventDefault()
+        const rangeStartPointClassName = 'range-start-point-range'
+        const standardTableRow = this.#getStandardTableRow()
         // フォーカスが当たっている要素がなければ終了
-        if (this.#value.length === 0) {
+        if (standardTableRow == null) {
             return
         }
-        const rangeStartPointClassName = 'range-start-point-range'
-        const firstTableRowIndex = 0
-        const firstTableRow = this.#value[firstTableRowIndex]
+
         // 初期値から最も上までのテーブル行を取得
-        firstTableRow.classList.add(rangeStartPointClassName)
+        standardTableRow.classList.add(rangeStartPointClassName)
         const rangeTableRows = Array.from(
             this.#table.querySelectorAll(`tbody tr:not(.${rangeStartPointClassName} ~ tr)`)
         ) as HTMLTableRowElement[]
-        firstTableRow.classList.remove(rangeStartPointClassName)
+        standardTableRow.classList.remove(rangeStartPointClassName)
         // moveRangeUpと同じように配列に追加されるように調整
         rangeTableRows.reverse()
 
