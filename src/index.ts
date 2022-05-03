@@ -85,6 +85,32 @@ class FocusManager {
         }
     }
 
+    #scrollTop(): void {
+        this.#tableViewer.scrollTo({ top: 0 })
+    }
+    #scrollBottom(): void {
+        this.#tableViewer.scrollTo({ top: this.#tableViewer.scrollHeight })
+    }
+    #scrollTableRowIntoView(tableRow: HTMLTableRowElement): void {
+        // テーブル行の下部がスクロール範囲外ならスクロール
+        // prettier-ignore
+        const bottom = this.#tableViewer.offsetTop + this.#tableViewer.offsetHeight - tableRow.offsetHeight
+        const currentBottom = Math.trunc(tableRow.getBoundingClientRect().bottom)
+        if (currentBottom > bottom) {
+            this.#tableViewer.scrollBy({
+                top: currentBottom - bottom,
+            })
+            return
+        }
+        // テーブル行の上部がスクロール範囲外ならスクロール
+        const top = this.#tableViewer.offsetTop + tableRow.offsetHeight
+        const currentTop = Math.trunc(tableRow.getBoundingClientRect().top)
+        if (currentTop <= top) {
+            this.#tableViewer.scrollBy({ top: currentTop - top })
+            return
+        }
+    }
+
     #moveDown(event: KeyboardEvent) {
         event.preventDefault()
         const nextTableRow = this.#getCurrentTableRow()?.nextElementSibling
@@ -95,14 +121,7 @@ class FocusManager {
         this.#unFocusAll()
         this.#focus(nextTableRow)
         // スクロール位置を調整
-        const bottom =
-            this.#tableViewer.offsetTop + this.#tableViewer.offsetHeight - nextTableRow.offsetHeight
-        const currentBottom = Math.trunc(nextTableRow.getBoundingClientRect().bottom)
-        if (currentBottom > bottom) {
-            this.#tableViewer.scrollBy({
-                top: currentBottom - bottom,
-            })
-        }
+        this.#scrollTableRowIntoView(nextTableRow)
     }
 
     #moveUp(event: KeyboardEvent) {
@@ -115,11 +134,7 @@ class FocusManager {
         this.#unFocusAll()
         this.#focus(previousTableRow)
         // スクロール位置を調整
-        const top = this.#tableViewer.offsetTop + previousTableRow.offsetHeight
-        const currentTop = Math.trunc(previousTableRow.getBoundingClientRect().top)
-        if (currentTop <= top) {
-            this.#tableViewer.scrollBy({ top: currentTop - top })
-        }
+        this.#scrollTableRowIntoView(previousTableRow)
     }
 
     #moveFarDown(event: KeyboardEvent) {
@@ -136,8 +151,7 @@ class FocusManager {
         this.#unFocusAll()
         this.#focus(lastTableRow)
         // スクロール位置を調整
-        // 最も下までスクロール
-        this.#tableViewer.scrollTo({ top: this.#tableViewer.scrollHeight })
+        this.#scrollBottom()
     }
 
     #moveFarUp(event: KeyboardEvent) {
@@ -154,8 +168,7 @@ class FocusManager {
         this.#unFocusAll()
         this.#focus(firstTableRow)
         // スクロール位置を調整
-        // 最も上までスクロール
-        this.#tableViewer.scrollTo({ top: 0 })
+        this.#scrollTop()
     }
 
     #moveRangeDown(event: KeyboardEvent) {
@@ -178,14 +191,7 @@ class FocusManager {
         }
 
         // スクロール位置を調整
-        const bottom =
-            this.#tableViewer.offsetTop + this.#tableViewer.offsetHeight - nextTableRow.offsetHeight
-        const currentBottom = Math.trunc(nextTableRow.getBoundingClientRect().bottom)
-        if (currentBottom > bottom) {
-            this.#tableViewer.scrollBy({
-                top: currentBottom - bottom,
-            })
-        }
+        this.#scrollTableRowIntoView(nextTableRow)
     }
 
     #moveRangeUp(event: KeyboardEvent) {
@@ -213,11 +219,7 @@ class FocusManager {
         }
 
         // スクロール位置を調整
-        const top = this.#tableViewer.offsetTop + previousTableRow.offsetHeight
-        const currentTop = Math.trunc(previousTableRow.getBoundingClientRect().top)
-        if (currentTop <= top) {
-            this.#tableViewer.scrollBy({ top: currentTop - top })
-        }
+        this.#scrollTableRowIntoView(previousTableRow)
     }
 
     #moveRangeFarDown(event: KeyboardEvent) {
@@ -242,8 +244,7 @@ class FocusManager {
         rangeTableRows.forEach((tableRow) => this.#focus(tableRow))
 
         // スクロール位置を調整
-        // 最も下までスクロール
-        this.#tableViewer.scrollTo({ top: this.#tableViewer.scrollHeight })
+        this.#scrollBottom()
     }
 
     #moveRangeFarUp(event: KeyboardEvent) {
@@ -269,8 +270,7 @@ class FocusManager {
         rangeTableRows.forEach((tableRow) => this.#focus(tableRow))
 
         // スクロール位置を調整
-        // 最も上までスクロール
-        this.#tableViewer.scrollTo({ top: 0 })
+        this.#scrollTop()
     }
     // EventHandler
     public get eventHandlers(): {
