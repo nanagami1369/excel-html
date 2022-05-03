@@ -261,6 +261,7 @@ class FocusManager {
     } {
         return {
             tableMouseDown: (event: Event): void => {
+                event.preventDefault()
                 let target = event.target
                 // テーブルセルなら親要素へ
                 if (target instanceof HTMLTableCellElement && target.tagName == 'TD') {
@@ -269,8 +270,84 @@ class FocusManager {
                 if (!(target instanceof HTMLTableRowElement)) {
                     return
                 }
+
+                // マウスで範囲選択に必要な変数を初期化
+                // マウスで範囲選択した要素を入れる配列
+                const selectMouseRangeTableRow: HTMLTableRowElement[] = []
+                // マウスで範囲選択された要素につけるクラス名
+                const focusSelectMouseRangeClassName: Readonly<string> = 'focus-select-mouse-range'
+                // マウスで範囲選択する関数
+                const selectRange = (tableRow: HTMLTableRowElement) => {
+                    tableRow.classList.add(focusSelectMouseRangeClassName)
+                    selectMouseRangeTableRow.push(tableRow)
+                }
+
+                // すべての範囲選択を解除
+                const unSelectRangeAll = () => {
+                    selectMouseRangeTableRow.forEach((tableRow) =>
+                        tableRow.classList.remove(focusSelectMouseRangeClassName)
+                    )
+                    selectMouseRangeTableRow.splice(0)
+                }
+
+                // マウスをおろした場所を初期値として選択する
+                const standardTableRow = target
+                selectRange(standardTableRow)
+
+                // マウスによるフォーカスの判定が始まった時点で前回のフォーカスは解除
                 this.#unFocusAll()
-                this.#focus(target)
+
+                // 初期値と現在のマウスの位置から現在選択されているテーブルの範囲を判定する関数
+                const focusSelectingTableRow = (event: Event) => {
+                    event.preventDefault()
+                    let target = event.target
+                    // テーブルセルなら親要素へ
+                    if (target instanceof HTMLTableCellElement && target.tagName == 'TD') {
+                        target = target.parentElement
+                    }
+                    if (!(target instanceof HTMLTableRowElement)) {
+                        return
+                    }
+                    unSelectRangeAll()
+                    // 範囲の判定
+                    const currentTableRow = target
+                    // 一つの要素のみを選択している場合
+                    if (standardTableRow.rowIndex == currentTableRow.rowIndex) {
+                        selectRange(standardTableRow)
+                    }
+                    // standard rowIndex 小
+                    // current   rowIndex 大
+                    // の場合
+                    else if (standardTableRow.rowIndex < currentTableRow.rowIndex) {
+                        Array.from(this.#table.rows)
+                            .slice(standardTableRow.rowIndex, currentTableRow.rowIndex)
+                            .forEach((tableRow) => selectRange(tableRow))
+                    }
+                    // current   rowIndex 大
+                    // standard rowIndex 小
+                    // の場合
+                    else {
+                        // standardTableRow (基準値)を中心に配列に入るようにreverseで配列を反転
+                        Array.from(this.#table.rows)
+                            .slice(currentTableRow.rowIndex, standardTableRow.rowIndex)
+                            .reverse()
+                            .forEach((tableRow) => selectRange(tableRow))
+                    }
+                }
+                const focusSelectTableRow = (event: Event) => {
+                    event.preventDefault()
+                    document.removeEventListener('mousemove', focusSelectingTableRow)
+                    document.removeEventListener('mousemove', focusSelectTableRow)
+                    selectMouseRangeTableRow.forEach((tableRow) => this.#focus(tableRow))
+                    unSelectRangeAll()
+                }
+                document.addEventListener('mousemove', focusSelectingTableRow, {
+                    passive: false,
+                })
+                document.addEventListener('mouseup', focusSelectTableRow, {
+                    passive: false,
+                })
+                event.preventDefault()
             },
             tableKeyDown: (event: KeyboardEvent) => {
                 switch (event.key) {
@@ -346,7 +423,9 @@ const setup = (): void => {
     }
     const focusManager = new FocusManager(main, table)
 
-    main.addEventListener('mousedown', focusManager.eventHandlers.tableMouseDown)
+    main.addEventListener('mousedown', focusManager.eventHandlers.tableMouseDown, {
+        passive: false,
+    })
     main.addEventListener('keydown', focusManager.eventHandlers.tableKeyDown, {
         passive: false,
     })
