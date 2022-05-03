@@ -416,8 +416,8 @@ class FocusManager {
 
 const setup = (): void => {
     // テストデータ読み込み
-    const testTemplate1 = document.querySelector('.test-template1')
-    const testTemplate2 = document.querySelector('.test-template2')
+    const testTemplate1 = document.querySelector('.test-template1')?.cloneNode(true)
+    const testTemplate2 = document.querySelector('.test-template2')?.cloneNode(true)
     if (
         !(
             testTemplate1 instanceof HTMLTableRowElement &&
@@ -426,10 +426,16 @@ const setup = (): void => {
     ) {
         throw new Error('testTemplate is null')
     }
+    document.querySelector('.test-template1')?.remove()
+    document.querySelector('.test-template2')?.remove()
     const tbody = document.querySelector('.table tbody')
-    for (let index = 0; index < 50; index++) {
-        tbody?.insertAdjacentElement('beforeend', testTemplate1.cloneNode(true) as HTMLElement)
-        tbody?.insertAdjacentElement('beforeend', testTemplate2.cloneNode(true) as HTMLElement)
+    for (let index = 0; index < 50; index += 2) {
+        const testTemplate1Copy = testTemplate1.cloneNode(true) as HTMLTableRowElement
+        const testTemplate2Copy = testTemplate1.cloneNode(true) as HTMLTableRowElement
+        testTemplate1Copy.cells.item(0)!.textContent = String(index)
+        testTemplate2Copy.cells.item(0)!.textContent = String(index + 1)
+        tbody?.insertAdjacentElement('beforeend', testTemplate1Copy as HTMLElement)
+        tbody?.insertAdjacentElement('beforeend', testTemplate2Copy as HTMLElement)
     }
     // イベントの登録
     const main = document.querySelector('main')
