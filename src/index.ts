@@ -184,9 +184,16 @@ class FocusManager {
         if (standardTableRow == null || currentTableRowIndex == null) {
             return
         }
-        if (nextTableRow.offsetTop > standardTableRow.offsetTop) {
+        // standardTableRow
+        // nextTableRow
+        // の場合
+        if (standardTableRow.rowIndex < nextTableRow.rowIndex) {
             this.#focus(nextTableRow)
-        } else {
+        }
+        // nextTableRow
+        // standardTableRow
+        // の場合
+        else {
             this.#unFocus(currentTableRowIndex)
         }
 
@@ -212,9 +219,16 @@ class FocusManager {
         if (standardTableRow == null || currentTableRowIndex == null) {
             return
         }
-        if (previousTableRow.offsetTop < standardTableRow.offsetTop) {
+        // previousTableRow
+        // standardTableRow
+        // の場合
+        if (previousTableRow.rowIndex < standardTableRow.rowIndex) {
             this.#focus(previousTableRow)
-        } else {
+        }
+        // standardTableRow
+        // previousTableRow
+        // の場合
+        else {
             this.#unFocus(currentTableRowIndex)
         }
 
