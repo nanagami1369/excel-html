@@ -320,7 +320,7 @@ class FocusManager {
                     // の場合
                     else if (standardTableRow.rowIndex < currentTableRow.rowIndex) {
                         Array.from(this.#table.rows)
-                            .slice(standardTableRow.rowIndex, currentTableRow.rowIndex)
+                            .slice(standardTableRow.rowIndex, currentTableRow.rowIndex + 1)
                             .forEach((tableRow) => selectRange(tableRow))
                     }
                     // current   rowIndex 大
@@ -329,10 +329,11 @@ class FocusManager {
                     else {
                         // standardTableRow (基準値)を中心に配列に入るようにreverseで配列を反転
                         Array.from(this.#table.rows)
-                            .slice(currentTableRow.rowIndex, standardTableRow.rowIndex)
+                            .slice(currentTableRow.rowIndex, standardTableRow.rowIndex + 1)
                             .reverse()
                             .forEach((tableRow) => selectRange(tableRow))
                     }
+                    console.log(currentTableRow)
                 }
                 const focusSelectTableRow = (event: Event) => {
                     event.preventDefault()
