@@ -3,15 +3,19 @@ export class FontSize {
 
     #min: number
     #max: number
+    #initSize: number
     #tickFrequency: number
+    #_fontSize: number
 
-    #_fontSize = 1
     constructor(
         element: HTMLElement,
+        initSize: number = 1,
         min: number = 0.5,
         max: number = Infinity,
         tickFrequency: number = 1.08
     ) {
+        this.#initSize = initSize
+        this.#_fontSize = this.#initSize
         this.#min = min
         this.#max = max
         this.#tickFrequency = tickFrequency
@@ -24,7 +28,7 @@ export class FontSize {
     }
 
     zoomReset() {
-        this.#_fontSize = 0
+        this.#_fontSize = this.#initSize
         this.element.style.fontSize = this.getFontSize()
     }
 
