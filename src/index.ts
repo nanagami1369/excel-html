@@ -1,6 +1,25 @@
 import './style/base.css'
 import './style/index.css'
 
+class SelectMouseRange {
+    // マウスで範囲選択した要素を入れる配列
+    value: HTMLTableRowElement[] = []
+    // マウスで範囲選択された要素につけるクラス名
+    #selectMouseRangeClassName: string = 'select-mouse-range'
+
+    // マウスで範囲選択する関数
+    select(tableRow: HTMLTableRowElement) {
+        tableRow.classList.add(this.#selectMouseRangeClassName)
+        this.value.push(tableRow)
+    }
+
+    // すべての範囲選択を解除
+    unSelectAll = () => {
+        this.value.forEach((tableRow) => tableRow.classList.remove(this.#selectMouseRangeClassName))
+        this.value.splice(0)
+    }
+}
+
 class FocusManager {
     #value: HTMLTableRowElement[] = []
 
@@ -300,27 +319,11 @@ class FocusManager {
                 }
 
                 // マウスで範囲選択に必要な変数を初期化
-                // マウスで範囲選択した要素を入れる配列
-                const selectMouseRangeTableRow: HTMLTableRowElement[] = []
-                // マウスで範囲選択された要素につけるクラス名
-                const focusSelectMouseRangeClassName: string = 'focus-select-mouse-range'
-                // マウスで範囲選択する関数
-                const selectMouseRange = (tableRow: HTMLTableRowElement) => {
-                    tableRow.classList.add(focusSelectMouseRangeClassName)
-                    selectMouseRangeTableRow.push(tableRow)
-                }
-
-                // すべての範囲選択を解除
-                const unSelectMouseRangeAll = () => {
-                    selectMouseRangeTableRow.forEach((tableRow) =>
-                        tableRow.classList.remove(focusSelectMouseRangeClassName)
-                    )
-                    selectMouseRangeTableRow.splice(0)
-                }
+                const selectRange = new SelectMouseRange()
 
                 // マウスをおろした場所を初期値として選択する
                 const standardTableRow = target
-                selectMouseRange(standardTableRow)
+                selectRange.select(standardTableRow)
 
                 // マウスによるフォーカスの判定が始まった時点で前回のフォーカスは解除
                 this.#unFocusAll()
@@ -336,12 +339,12 @@ class FocusManager {
                     if (!(target instanceof HTMLTableRowElement)) {
                         return
                     }
-                    unSelectMouseRangeAll()
+                    selectRange.unSelectAll()
                     // 範囲の判定
                     const currentTableRow = target
                     // 一つの要素のみを選択している場合
                     if (standardTableRow.rowIndex == currentTableRow.rowIndex) {
-                        selectMouseRange(standardTableRow)
+                        selectRange.select(standardTableRow)
                     }
                     // standard rowIndex 小
                     // current   rowIndex 大
@@ -349,7 +352,7 @@ class FocusManager {
                     else if (standardTableRow.rowIndex < currentTableRow.rowIndex) {
                         Array.from(this.#table.rows)
                             .slice(standardTableRow.rowIndex, currentTableRow.rowIndex + 1)
-                            .forEach((tableRow) => selectMouseRange(tableRow))
+                            .forEach((tableRow) => selectRange.select(tableRow))
                     }
                     // current   rowIndex 大
                     // standard rowIndex 小
@@ -359,7 +362,7 @@ class FocusManager {
                         Array.from(this.#table.rows)
                             .slice(currentTableRow.rowIndex, standardTableRow.rowIndex + 1)
                             .reverse()
-                            .forEach((tableRow) => selectMouseRange(tableRow))
+                            .forEach((tableRow) => selectRange.select(tableRow))
                     }
                     console.log(currentTableRow)
                 }
@@ -367,8 +370,8 @@ class FocusManager {
                     event.preventDefault()
                     document.removeEventListener('mousemove', selectingMouseRangeTableRow)
                     document.removeEventListener('mousemove', focusMouseRangeTableRow)
-                    selectMouseRangeTableRow.forEach((tableRow) => this.#focus(tableRow))
-                    unSelectMouseRangeAll()
+                    selectRange.value.forEach((tableRow) => this.#focus(tableRow))
+                    selectRange.unSelectAll()
                 }
                 document.addEventListener('mousemove', selectingMouseRangeTableRow, {
                     passive: false,

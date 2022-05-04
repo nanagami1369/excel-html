@@ -65,6 +65,6 @@ table thead th::after {
     background-color: #80f0ca;
 }
 
-.focus-select-mouse-range td {
+.select-mouse-range td {
     background-color: #9bffa9;
 }
