@@ -55,6 +55,14 @@ class FocusManager {
         this.#focus(firstTableRow)
     }
 
+    #getHeaderTableRow(): HTMLTableRowElement {
+        // テーブルヘッダーは必ずあるはずなので無ければ例外
+        if (this.#table.tHead == null || this.#table.tHead.rows.length === 0) {
+            throw new Error('table header is not found')
+        }
+        return this.#table.tHead.rows[0]
+    }
+
     #getFirstTableRow(): HTMLTableRowElement | null {
         return this.#table.querySelector('tbody tr:first-child')
     }
@@ -337,10 +345,50 @@ class FocusManager {
                 this.#unFocusAll()
 
                 // 初期値と現在のマウスの位置から現在選択されているテーブルの範囲を判定する関数
-                const selectingMouseRangeTableRow = (event: Event) => {
+                const selectingMouseRangeTableRow = (event: MouseEvent) => {
                     event.preventDefault()
-                    let target = event.target
-                    // テーブルセルなら親要素へ
+
+                    // マウスの高さから次に選択するテーブル行を割り出す
+
+                    // TableViewの画面上の一番上の位置を取得
+                    const { top } = this.#tableViewer.getBoundingClientRect()
+                    // ヘッダーを除いたテーブル上部
+                    const tableTop = top + this.#getHeaderTableRow().clientHeight // ヘッダーの高さ分下げる
+                    // スクロールバーを除いたテーブル下部
+                    const tableBottom = top + this.#tableViewer.clientHeight
+                    // マウスの画面上の高さ
+                    const mouseY = event.clientY
+
+                    let target: unknown
+                    // マウス座標
+                    // ---- テーブル上部 ----
+                    // なら現在位置の一つ上の要素をtargetに
+                    console.log(mouseY, tableTop, tableBottom)
+                    if (mouseY < tableTop) {
+                        console.log('上', tableTop)
+                        const previousElement = selectRange.getCurrent()?.previousElementSibling
+                        target = previousElement
+                    }
+                    // ---- テーブル下部 ----
+                    // マウス座標
+                    // なら現在位置の一つ下の要素をtargetに
+                    else if (mouseY > tableBottom) {
+                        const nextElement = selectRange.getCurrent()?.nextElementSibling
+                        target = nextElement
+                        console.log('下', target)
+                    }
+                    // ---- テーブル上部 ----
+                    // マウス座標
+                    // ---- テーブル下部 ----
+                    // ならフォーカスが当たっているtargetに
+                    else {
+                        target = event.target
+                        console.log('中', target)
+                    }
+
+                    // 次に選択するテーブル行を実際に選択する
+
+                    // targetがテーブルセルなら親要素へ
                     if (target instanceof HTMLTableCellElement && target.tagName == 'TD') {
                         target = target.parentElement
                     }
