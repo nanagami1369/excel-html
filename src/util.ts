@@ -40,7 +40,8 @@ export class FontSize {
         this.element.style.fontSize = this.getFontSize()
     }
     zoomOut() {
-        this.#_fontSize /= this.#tickFrequency
+        // なぜか1回だけ割っても縮小しなかったので2回割る
+        this.#_fontSize = this.#_fontSize / this.#tickFrequency / this.#tickFrequency
         if (this.#min > this.#_fontSize) {
             this.#_fontSize = this.#min
         }
