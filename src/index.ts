@@ -441,7 +441,7 @@ const setup = (): void => {
     const tbody = document.querySelector('.table tbody')
     for (let index = 0; index < 50; index += 2) {
         const testTemplate1Copy = testTemplate1.cloneNode(true) as HTMLTableRowElement
-        const testTemplate2Copy = testTemplate1.cloneNode(true) as HTMLTableRowElement
+        const testTemplate2Copy = testTemplate2.cloneNode(true) as HTMLTableRowElement
         testTemplate1Copy.cells.item(0)!.textContent = String(index)
         testTemplate2Copy.cells.item(0)!.textContent = String(index + 1)
         tbody?.insertAdjacentElement('beforeend', testTemplate1Copy as HTMLElement)
