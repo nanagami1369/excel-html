@@ -348,7 +348,6 @@ class FocusManager {
 
                 // 初期値と現在のマウスの位置から現在選択されているテーブルの範囲を判定する関数
                 const selectingMouseRangeTableRow = () => {
-
                     // マウスの高さから次に選択するテーブル行を割り出す
 
                     // TableViewの画面上の一番上の位置を取得
@@ -534,7 +533,7 @@ const setup = (): void => {
     main.addEventListener('keydown', focusManager.eventHandlers.tableKeyDown, {
         passive: false,
     })
-    const fontSize = new FontSize(table, 0.5, 5)
+    const fontSize = new FontSize(table, 1, 0.5, 5)
     document.addEventListener(
         'wheel',
         (e) => {
@@ -547,6 +546,30 @@ const setup = (): void => {
                 // zoom in
                 else {
                     fontSize.zoomIn()
+                }
+            }
+        },
+        { passive: false }
+    )
+    document.addEventListener(
+        'keydown',
+        (e) => {
+            if (e.ctrlKey) {
+                switch (e.key) {
+                    case '0':
+                        fontSize.zoomReset()
+                        e.preventDefault()
+                        break
+                    case '-':
+                        fontSize.zoomOut()
+                        e.preventDefault()
+                    case '=':
+                    case ';':
+                        fontSize.zoomIn()
+                        e.preventDefault()
+                        break
+                    default:
+                        break
                 }
             }
         },
