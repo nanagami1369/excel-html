@@ -203,10 +203,6 @@ class FocusManager {
 
     #moveRangeUp(event: KeyboardEvent) {
         event.preventDefault()
-        // フォーカスが当たっている要素がなければ終了
-        if (this.#value.length === 0) {
-            return
-        }
         const previousTableRow = this.#getCurrentTableRow()?.previousElementSibling
 
         // 次のテーブル行がなければ終了
