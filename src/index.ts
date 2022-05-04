@@ -482,7 +482,7 @@ class FocusManager {
                 const focusMouseRangeTableRow = (event: Event) => {
                     event.preventDefault()
                     document.removeEventListener('mousemove', selectingMouseRangeTableRow)
-                    document.removeEventListener('mousemove', focusMouseRangeTableRow)
+                    document.removeEventListener('mouseup', focusMouseRangeTableRow)
                     selectRange.value.forEach((tableRow) => this.#focus(tableRow))
                     selectRange.unSelectAll()
                 }
