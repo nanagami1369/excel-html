@@ -47,6 +47,47 @@ class FontSize {
     }
 }
 
+class MousePosition {
+    #clientX: number
+    #clientY: number
+    #target: EventTarget | null
+    constructor(event: MouseEvent) {
+        this.#clientX = event.clientX
+        this.#clientY = event.clientY
+        this.#target = event.target
+        document.addEventListener('mousemove', this.eventHandlers.mouseMove)
+    }
+
+    getClientX(): number {
+        return this.#clientX
+    }
+    getClientY(): number {
+        return this.#clientY
+    }
+
+    getTarget(): EventTarget | null {
+        return this.#target
+    }
+
+    //最新のマウス座標を取得しなくなります
+    Dispose() {
+        document.removeEventListener('mousemove', this.eventHandlers.mouseMove)
+    }
+
+    // eventHandler
+    get eventHandlers(): {
+        mouseMove: (event: MouseEvent) => void
+    } {
+        return {
+            mouseMove: (event: MouseEvent): void => {
+                this.#clientX = event.clientX
+                this.#clientY = event.clientY
+                this.#target = event.target
+            },
+        }
+    }
+}
+
 class SelectMouseRange {
     // マウスで範囲選択した要素を入れる配列
     value: HTMLTableRowElement[] = []
@@ -365,11 +406,11 @@ class FocusManager {
     }
     // EventHandler
     public get eventHandlers(): {
-        tableMouseDown: (event: Event) => void
+        tableMouseDown: (event: MouseEvent) => void
         tableKeyDown: (event: KeyboardEvent) => void
     } {
         return {
-            tableMouseDown: (event: Event): void => {
+            tableMouseDown: (event: MouseEvent): void => {
                 event.preventDefault()
                 let target = event.target
                 // テーブルセルなら親要素へ
@@ -382,6 +423,7 @@ class FocusManager {
 
                 // マウスで範囲選択に必要な変数を初期化
                 const selectRange = new SelectMouseRange()
+                const mousePosition = new MousePosition(event)
 
                 // マウスをおろした場所を初期値として選択する
                 const standardTableRow = target
@@ -391,8 +433,7 @@ class FocusManager {
                 this.#unFocusAll()
 
                 // 初期値と現在のマウスの位置から現在選択されているテーブルの範囲を判定する関数
-                const selectingMouseRangeTableRow = (event: MouseEvent) => {
-                    event.preventDefault()
+                const selectingMouseRangeTableRow = () => {
 
                     // マウスの高さから次に選択するテーブル行を割り出す
 
@@ -403,7 +444,7 @@ class FocusManager {
                     // スクロールバーを除いたテーブル下部
                     const tableBottom = top + this.#tableViewer.clientHeight
                     // マウスの画面上の高さ
-                    const mouseY = event.clientY
+                    const mouseY = mousePosition.getClientY()
 
                     let target: unknown
                     // マウス座標
@@ -428,7 +469,7 @@ class FocusManager {
                     // ---- テーブル下部 ----
                     // ならフォーカスが当たっているtargetに
                     else {
-                        target = event.target
+                        target = mousePosition.getTarget()
                         console.log('中', target)
                     }
 
@@ -479,16 +520,15 @@ class FocusManager {
                         this.#scrollTableRowIntoView(nextElementSibling)
                     }
                 }
+                const mouseMovePoolingId = setInterval(selectingMouseRangeTableRow, 50)
                 const focusMouseRangeTableRow = (event: Event) => {
                     event.preventDefault()
-                    document.removeEventListener('mousemove', selectingMouseRangeTableRow)
+                    clearInterval(mouseMovePoolingId)
+                    mousePosition.Dispose()
                     document.removeEventListener('mouseup', focusMouseRangeTableRow)
                     selectRange.value.forEach((tableRow) => this.#focus(tableRow))
                     selectRange.unSelectAll()
                 }
-                document.addEventListener('mousemove', selectingMouseRangeTableRow, {
-                    passive: false,
-                })
                 document.addEventListener('mouseup', focusMouseRangeTableRow, {
                     passive: false,
                 })
