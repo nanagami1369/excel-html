@@ -1,6 +1,52 @@
 import './style/base.css'
 import './style/index.css'
 
+class FontSize {
+    element: HTMLElement
+
+    #min: number
+    #max: number
+    #tickFrequency: number
+
+    #_fontSize = 1
+    constructor(
+        element: HTMLElement,
+        min: number = 0.5,
+        max: number = Infinity,
+        tickFrequency: number = 1.08
+    ) {
+        this.#min = min
+        this.#max = max
+        this.#tickFrequency = tickFrequency
+        this.element = element
+        this.element.style.fontSize = this.getFontSize()
+    }
+
+    getFontSize() {
+        return this.#_fontSize + 'em'
+    }
+
+    zoomReset() {
+        this.#_fontSize = 0
+        this.element.style.fontSize = this.getFontSize()
+    }
+
+    zoomIn() {
+        this.#_fontSize *= this.#tickFrequency
+        if (this.#_fontSize > this.#max) {
+            this.#_fontSize = this.#max
+        }
+        this.element.style.fontSize = this.getFontSize()
+    }
+    zoomOut() {
+        this.#_fontSize /= this.#tickFrequency
+        if (this.#min > this.#_fontSize) {
+            this.#_fontSize = this.#min
+        }
+        this.element.style.fontSize = this.getFontSize()
+    }
+}
+
 class SelectMouseRange {
     // マウスで範囲選択した要素を入れる配列
     value: HTMLTableRowElement[] = []
@@ -534,6 +580,24 @@ const setup = (): void => {
     main.addEventListener('keydown', focusManager.eventHandlers.tableKeyDown, {
         passive: false,
     })
+    const fontSize = new FontSize(table, 0.5, 5)
+    document.addEventListener(
+        'wheel',
+        (e) => {
+            if (e.ctrlKey) {
+                e.preventDefault()
+                // zoom out
+                if (e.deltaY > 0) {
+                    fontSize.zoomOut()
+                }
+                // zoom in
+                else {
+                    fontSize.zoomIn()
+                }
+            }
+        },
+        { passive: false }
+    )
 }
 
 window.addEventListener('DOMContentLoaded', setup)
