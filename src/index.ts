@@ -18,6 +18,14 @@ class SelectMouseRange {
         this.value.forEach((tableRow) => tableRow.classList.remove(this.#selectMouseRangeClassName))
         this.value.splice(0)
     }
+
+    getCurrent(): HTMLTableRowElement | null {
+        if (this.value.length === 0) {
+            return null
+        } else {
+            return this.value[this.value.length - 1]
+        }
+    }
 }
 
 class FocusManager {
@@ -364,7 +372,18 @@ class FocusManager {
                             .reverse()
                             .forEach((tableRow) => selectRange.select(tableRow))
                     }
-                    console.log(currentTableRow)
+                    const currentRange = selectRange.getCurrent()
+                    // 範囲選択されていなければ終了
+                    if (currentRange == null) {
+                        return
+                    }
+                    const { previousElementSibling, nextElementSibling } = currentRange
+                    if (previousElementSibling instanceof HTMLTableRowElement) {
+                        this.#scrollTableRowIntoView(previousElementSibling)
+                    }
+                    if (nextElementSibling instanceof HTMLTableRowElement) {
+                        this.#scrollTableRowIntoView(nextElementSibling)
+                    }
                 }
                 const focusMouseRangeTableRow = (event: Event) => {
                     event.preventDefault()
