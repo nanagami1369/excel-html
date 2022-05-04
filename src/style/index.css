@@ -38,6 +38,20 @@ main {
     border-left: 2px solid gray;
 }
 
+.table th.table-data-id {
+    min-width: 3em;
+}
+
+.table td.table-data-id {
+    min-width: 3em;
+    text-align: right;
+}
+
+.table :where(th.table-data-memo, td.table-data-memo) {
+    min-width: 3em;
+    width: 100%;
+}
+
 .focus-table-row td {
     background-color: #80f0ca;
 }
