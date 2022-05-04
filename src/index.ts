@@ -305,13 +305,13 @@ class FocusManager {
                 // マウスで範囲選択された要素につけるクラス名
                 const focusSelectMouseRangeClassName: string = 'focus-select-mouse-range'
                 // マウスで範囲選択する関数
-                const selectRange = (tableRow: HTMLTableRowElement) => {
+                const selectMouseRange = (tableRow: HTMLTableRowElement) => {
                     tableRow.classList.add(focusSelectMouseRangeClassName)
                     selectMouseRangeTableRow.push(tableRow)
                 }
 
                 // すべての範囲選択を解除
-                const unSelectRangeAll = () => {
+                const unSelectMouseRangeAll = () => {
                     selectMouseRangeTableRow.forEach((tableRow) =>
                         tableRow.classList.remove(focusSelectMouseRangeClassName)
                     )
@@ -320,13 +320,13 @@ class FocusManager {
 
                 // マウスをおろした場所を初期値として選択する
                 const standardTableRow = target
-                selectRange(standardTableRow)
+                selectMouseRange(standardTableRow)
 
                 // マウスによるフォーカスの判定が始まった時点で前回のフォーカスは解除
                 this.#unFocusAll()
 
                 // 初期値と現在のマウスの位置から現在選択されているテーブルの範囲を判定する関数
-                const focusSelectingTableRow = (event: Event) => {
+                const selectingMouseRangeTableRow = (event: Event) => {
                     event.preventDefault()
                     let target = event.target
                     // テーブルセルなら親要素へ
@@ -336,12 +336,12 @@ class FocusManager {
                     if (!(target instanceof HTMLTableRowElement)) {
                         return
                     }
-                    unSelectRangeAll()
+                    unSelectMouseRangeAll()
                     // 範囲の判定
                     const currentTableRow = target
                     // 一つの要素のみを選択している場合
                     if (standardTableRow.rowIndex == currentTableRow.rowIndex) {
-                        selectRange(standardTableRow)
+                        selectMouseRange(standardTableRow)
                     }
                     // standard rowIndex 小
                     // current   rowIndex 大
@@ -349,7 +349,7 @@ class FocusManager {
                     else if (standardTableRow.rowIndex < currentTableRow.rowIndex) {
                         Array.from(this.#table.rows)
                             .slice(standardTableRow.rowIndex, currentTableRow.rowIndex + 1)
-                            .forEach((tableRow) => selectRange(tableRow))
+                            .forEach((tableRow) => selectMouseRange(tableRow))
                     }
                     // current   rowIndex 大
                     // standard rowIndex 小
@@ -359,21 +359,21 @@ class FocusManager {
                         Array.from(this.#table.rows)
                             .slice(currentTableRow.rowIndex, standardTableRow.rowIndex + 1)
                             .reverse()
-                            .forEach((tableRow) => selectRange(tableRow))
+                            .forEach((tableRow) => selectMouseRange(tableRow))
                     }
                     console.log(currentTableRow)
                 }
-                const focusSelectTableRow = (event: Event) => {
+                const focusMouseRangeTableRow = (event: Event) => {
                     event.preventDefault()
-                    document.removeEventListener('mousemove', focusSelectingTableRow)
-                    document.removeEventListener('mousemove', focusSelectTableRow)
+                    document.removeEventListener('mousemove', selectingMouseRangeTableRow)
+                    document.removeEventListener('mousemove', focusMouseRangeTableRow)
                     selectMouseRangeTableRow.forEach((tableRow) => this.#focus(tableRow))
-                    unSelectRangeAll()
+                    unSelectMouseRangeAll()
                 }
-                document.addEventListener('mousemove', focusSelectingTableRow, {
+                document.addEventListener('mousemove', selectingMouseRangeTableRow, {
                     passive: false,
                 })
-                document.addEventListener('mouseup', focusSelectTableRow, {
+                document.addEventListener('mouseup', focusMouseRangeTableRow, {
                     passive: false,
                 })
                 event.preventDefault()
