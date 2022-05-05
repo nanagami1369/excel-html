@@ -122,3 +122,15 @@ export class MousePosition {
         }
     }
 }
+
+export class InfoView {
+    #FocusTableRowLength: HTMLSpanElement
+    constructor(focusTableRowLength: HTMLSpanElement) {
+        this.#FocusTableRowLength = focusTableRowLength
+        this.Writer(0)
+    }
+
+    Writer(focusTableRowLength: number) {
+        this.#FocusTableRowLength.textContent = String(focusTableRowLength)
+    }
+}

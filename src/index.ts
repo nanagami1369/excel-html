@@ -1,6 +1,6 @@
 import './style/base.css'
 import './style/index.css'
-import { FontZoomManager, MousePosition } from './util'
+import { FontZoomManager, InfoView, MousePosition } from './util'
 
 class SelectMouseRange {
     // マウスで範囲選択した要素を入れる配列
@@ -56,10 +56,13 @@ class FocusManager {
     // テーブルそのもの
     #table: HTMLTableElement
 
-    constructor(tableViewer: HTMLElement, table: HTMLTableElement) {
+    // 情報を表示するクラス
+    #infoView: InfoView
+
+    constructor(tableViewer: HTMLElement, table: HTMLTableElement, infoView: InfoView) {
         this.#tableViewer = tableViewer
         this.#table = table
-
+        this.#infoView = infoView
         // すぐに操作できるようにテーブルにフォーカスを当てる
         this.#tableViewer.focus()
         //アクセス時に最初の要素にフォーカスを当てる
@@ -100,11 +103,13 @@ class FocusManager {
     #focus(target: HTMLTableRowElement): void {
         target.classList.add(this.#FocusTableRowClassName)
         this.#value.push(target)
+        this.#infoView.Writer(this.#value.length)
     }
 
     #focusAll(): void {
         this.#unFocusAll()
         this.#getTableRowAll()?.forEach((tableRows) => this.#focus(tableRows))
+        this.#infoView.Writer(this.#value.length)
     }
 
     #unFocus(focusTableRow: HTMLTableRowElement): void {
@@ -114,11 +119,13 @@ class FocusManager {
         }
         this.#value[focusTableRowIndex].classList.remove(this.#FocusTableRowClassName)
         this.#value.splice(focusTableRowIndex, 1)
+        this.#infoView.Writer(this.#value.length)
     }
 
     #unFocusAll(): void {
         this.#value.forEach((tableRow) => tableRow.classList.remove(this.#FocusTableRowClassName))
         this.#value.splice(0)
+        this.#infoView.Writer(this.#value.length)
     }
 
     #getStandardTableRow(): HTMLTableRowElement | null {
@@ -584,7 +591,12 @@ const setup = (): void => {
     if (!(table instanceof HTMLTableElement)) {
         throw new Error('not found table Element ')
     }
-    new FocusManager(main, table)
+    const focusTableRowLength = document.querySelector('#focus-table-row-length')
+    if (!(focusTableRowLength instanceof HTMLSpanElement)) {
+        throw new Error('not found Focus table row length Element ')
+    }
+    const infoView = new InfoView(focusTableRowLength)
+    new FocusManager(main, table, infoView)
     new FontZoomManager(table, 1, 0.5, 5)
 }
 
