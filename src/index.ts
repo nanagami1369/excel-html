@@ -72,7 +72,7 @@ class FocusManager {
         this.#tableViewer.addEventListener('mousedown', this.eventHandlers.tableMouseDown, {
             passive: false,
         })
-        this.#tableViewer.addEventListener('keydown', this.eventHandlers.tableKeyDown, {
+        document.addEventListener('keydown', this.eventHandlers.tableKeyDown, {
             passive: false,
         })
     }
@@ -340,7 +340,7 @@ class FocusManager {
     Dispose() {
         this.#unFocusAll()
         this.#tableViewer.removeEventListener('mousedown', this.eventHandlers.tableMouseDown)
-        this.#tableViewer.removeEventListener('keydown', this.eventHandlers.tableKeyDown)
+        document.removeEventListener('keydown', this.eventHandlers.tableKeyDown)
     }
 
     // EventHandler
