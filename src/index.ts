@@ -439,6 +439,7 @@ class FocusManager {
                     clearInterval(mouseMovePoolingId)
                     mousePosition.Dispose()
                     document.removeEventListener('mouseup', focusMouseRangeTableRow)
+                    // 選択範囲をフォーカスする
                     selectRange.value.forEach((tableRow) => this.#focus(tableRow))
                     selectRange.unSelectAll()
                 }
