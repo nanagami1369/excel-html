@@ -4,35 +4,41 @@ import { FontZoomManager, MousePosition } from './util'
 
 class SelectMouseRange {
     // マウスで範囲選択した要素を入れる配列
-    value: HTMLTableRowElement[] = []
+    #value: HTMLTableRowElement[] = []
     // マウスで範囲選択された要素につけるクラス名
     #selectMouseRangeClassName: string = 'select-mouse-range'
 
     // マウスで範囲選択する関数
     select(tableRow: HTMLTableRowElement) {
         tableRow.classList.add(this.#selectMouseRangeClassName)
-        this.value.push(tableRow)
+        this.#value.push(tableRow)
     }
 
     // すべての範囲選択を解除
     unSelectAll(): void {
-        this.value.forEach((tableRow) => tableRow.classList.remove(this.#selectMouseRangeClassName))
-        this.value.splice(0)
+        this.#value.forEach((tableRow) =>
+            tableRow.classList.remove(this.#selectMouseRangeClassName)
+        )
+        this.#value.splice(0)
+    }
+
+    getValue(): HTMLTableRowElement[] {
+        return this.#value
     }
 
     getStandard(): HTMLTableRowElement | null {
-        if (this.value.length === 0) {
+        if (this.#value.length === 0) {
             return null
         } else {
-            return this.value[0]
+            return this.#value[0]
         }
     }
 
     getCurrent(): HTMLTableRowElement | null {
-        if (this.value.length === 0) {
+        if (this.#value.length === 0) {
             return null
         } else {
-            return this.value[this.value.length - 1]
+            return this.#value[this.#value.length - 1]
         }
     }
 }
@@ -466,9 +472,11 @@ class FocusManager {
                     if (isStandardAlreadyFocus) {
                         // 選択範囲をフォーカス解除
                         // ※ focusとunFocusでやると辛かったので直接テーブルを書き換えて再取得する
-                        selectRange.value.forEach((tableRow) =>
-                            tableRow.classList.remove(this.#FocusTableRowClassName)
-                        )
+                        selectRange
+                            .getValue()
+                            .forEach((tableRow) =>
+                                tableRow.classList.remove(this.#FocusTableRowClassName)
+                            )
                         const focusTableRows = document.querySelectorAll<HTMLTableRowElement>(
                             `tr.${this.#FocusTableRowClassName}`
                         )
@@ -477,9 +485,11 @@ class FocusManager {
                     } else {
                         // 選択範囲をフォーカス
                         // ※ focusとunFocusでやると辛かったので直接テーブルを書き換えて再取得する
-                        selectRange.value.forEach((tableRow) =>
-                            tableRow.classList.add(this.#FocusTableRowClassName)
-                        )
+                        selectRange
+                            .getValue()
+                            .forEach((tableRow) =>
+                                tableRow.classList.add(this.#FocusTableRowClassName)
+                            )
                         const focusTableRows = document.querySelectorAll<HTMLTableRowElement>(
                             `tr.${this.#FocusTableRowClassName}`
                         )
