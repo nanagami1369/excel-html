@@ -371,9 +371,7 @@ class FocusManager {
                     // マウス座標
                     // ---- テーブル上部 ----
                     // なら現在位置の一つ上の要素をtargetに
-                    console.log(mouseY, tableTop, tableBottom)
                     if (mouseY < tableTop) {
-                        console.log('上', tableTop)
                         const previousElement = selectRange.getCurrent()?.previousElementSibling
                         target = previousElement
                     }
@@ -383,7 +381,6 @@ class FocusManager {
                     else if (mouseY > tableBottom) {
                         const nextElement = selectRange.getCurrent()?.nextElementSibling
                         target = nextElement
-                        console.log('下', target)
                     }
                     // ---- テーブル上部 ----
                     // マウス座標
@@ -391,7 +388,6 @@ class FocusManager {
                     // ならフォーカスが当たっているtargetに
                     else {
                         target = mousePosition.getTarget()
-                        console.log('中', target)
                     }
 
                     // 次に選択するテーブル行を実際に選択する
