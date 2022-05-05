@@ -102,10 +102,9 @@ class FocusManager {
         this.#value.push(target)
     }
 
-    #focusAll(event: Event): void {
+    #focusAll(): void {
         this.#unFocusAll()
         this.#getTableRowAll()?.forEach((tableRows) => this.#focus(tableRows))
-        event.preventDefault()
     }
 
     #unFocus(focusTableRow: HTMLTableRowElement): void {
@@ -540,7 +539,8 @@ class FocusManager {
                         break
                     case 'a':
                         if (event.ctrlKey) {
-                            this.#focusAll(event)
+                            this.#focusAll()
+                            event.preventDefault()
                         }
                         break
                     default:
