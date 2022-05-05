@@ -1,6 +1,6 @@
 import './style/base.css'
 import './style/index.css'
-import { FontSize, MousePosition } from './util'
+import { FontZoomManager, MousePosition } from './util'
 
 class SelectMouseRange {
     // マウスで範囲選択した要素を入れる配列
@@ -533,33 +533,7 @@ const setup = (): void => {
     main.addEventListener('keydown', focusManager.eventHandlers.tableKeyDown, {
         passive: false,
     })
-    const fontSize = new FontSize(table, 1, 0.5, 5)
-    document.addEventListener(
-        'wheel',
-        (e) => {
-            if (e.ctrlKey) {
-                e.preventDefault()
-                // zoom out
-                if (e.deltaY > 0) {
-                    fontSize.zoomOut()
-                }
-                // zoom in
-                else {
-                    fontSize.zoomIn()
-                }
-            }
-        },
-        { passive: false }
-    )
-    document.addEventListener(
-        'keydown',
-        (e) => {
-            if (e.ctrlKey && e.key === '0') {
-                fontSize.zoomReset()
-            }
-        },
-        { passive: false }
-    )
+    new FontZoomManager(table, 1, 0.5, 5)
 }
 
 window.addEventListener('DOMContentLoaded', setup)

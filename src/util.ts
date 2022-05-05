@@ -1,4 +1,4 @@
-export class FontSize {
+export class FontZoomManager {
     element: HTMLElement
 
     #min: number
@@ -21,6 +21,9 @@ export class FontSize {
         this.#tickFrequency = tickFrequency
         this.element = element
         this.element.style.fontSize = this.getFontSize()
+
+        document.addEventListener('wheel', this.eventHandlers.wheel, { passive: false })
+        document.addEventListener('keydown', this.eventHandlers.keyDown, { passive: false })
     }
 
     getFontSize() {
@@ -46,6 +49,36 @@ export class FontSize {
             this.#_fontSize = this.#min
         }
         this.element.style.fontSize = this.getFontSize()
+    }
+
+    // zoomの拡大縮小をできなくします
+    Dispose() {
+        document.removeEventListener('wheel', this.eventHandlers.wheel)
+        document.removeEventListener('keydown', this.eventHandlers.keyDown)
+    }
+
+    // eventHandler
+    get eventHandlers(): {
+        wheel: (event: WheelEvent) => void
+        keyDown: (event: KeyboardEvent) => void
+    } {
+        return {
+            wheel: (event: WheelEvent): void => {
+                if (event.ctrlKey) {
+                    event.preventDefault()
+                    if (event.deltaY > 0) {
+                        this.zoomOut()
+                    } else {
+                        this.zoomIn()
+                    }
+                }
+            },
+            keyDown: (event: KeyboardEvent) => {
+                if (event.ctrlKey && event.key === '0') {
+                    this.zoomReset()
+                }
+            },
+        }
     }
 }
 
