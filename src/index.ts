@@ -15,7 +15,7 @@ class SelectMouseRange {
     }
 
     // すべての範囲選択を解除
-    unSelectAll = () => {
+    unSelectAll(): void {
         this.value.forEach((tableRow) => tableRow.classList.remove(this.#selectMouseRangeClassName))
         this.value.splice(0)
     }
