@@ -504,6 +504,9 @@ class FocusManager {
                 event.preventDefault()
             },
             tableKeyDown: (event: KeyboardEvent) => {
+                if (document.activeElement instanceof HTMLInputElement) {
+                    return
+                }
                 switch (event.key) {
                     case 'ArrowDown':
                         if (event.ctrlKey) {
