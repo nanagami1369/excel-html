@@ -62,6 +62,13 @@ class FocusManager {
             return
         }
         this.#focus(firstTableRow)
+
+        this.#tableViewer.addEventListener('mousedown', this.eventHandlers.tableMouseDown, {
+            passive: false,
+        })
+        this.#tableViewer.addEventListener('keydown', this.eventHandlers.tableKeyDown, {
+            passive: false,
+        })
     }
 
     #getHeaderTableRow(): HTMLTableRowElement {
@@ -322,6 +329,14 @@ class FocusManager {
         // スクロール位置を調整
         this.#scrollTop()
     }
+
+    // 通常のテーブルに戻します
+    Dispose() {
+        this.#unFocusAll()
+        this.#tableViewer.removeEventListener('mousedown', this.eventHandlers.tableMouseDown)
+        this.#tableViewer.removeEventListener('keydown', this.eventHandlers.tableKeyDown)
+    }
+
     // EventHandler
     public get eventHandlers(): {
         tableMouseDown: (event: MouseEvent) => void
@@ -556,14 +571,7 @@ const setup = (): void => {
     if (!(table instanceof HTMLTableElement)) {
         throw new Error('not found table Element ')
     }
-    const focusManager = new FocusManager(main, table)
-
-    main.addEventListener('mousedown', focusManager.eventHandlers.tableMouseDown, {
-        passive: false,
-    })
-    main.addEventListener('keydown', focusManager.eventHandlers.tableKeyDown, {
-        passive: false,
-    })
+    new FocusManager(main, table)
     new FontZoomManager(table, 1, 0.5, 5)
 }
 
