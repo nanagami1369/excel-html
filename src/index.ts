@@ -87,7 +87,11 @@ class FocusManager {
         event.preventDefault()
     }
 
-    #unFocus(focusTableRowIndex: number): void {
+    #unFocus(focusTableRow: HTMLTableRowElement): void {
+        const focusTableRowIndex = this.#value.indexOf(focusTableRow)
+        if (focusTableRowIndex === -1) {
+            return
+        }
         this.#value[focusTableRowIndex].classList.remove(this.#FocusTableRowClassName)
         this.#value.splice(focusTableRowIndex, 1)
     }
@@ -110,14 +114,6 @@ class FocusManager {
             return null
         } else {
             return this.#value[this.#value.length - 1]
-        }
-    }
-
-    #getCurrentTableRowIndex(): number | null {
-        if (this.#value.length === 0) {
-            return -1
-        } else {
-            return this.#value.length - 1
         }
     }
 
@@ -215,9 +211,9 @@ class FocusManager {
             return
         }
         const standardTableRow = this.#getStandardTableRow()
-        const currentTableRowIndex = this.#getCurrentTableRowIndex()
+        const currentTableRow = this.#getCurrentTableRow()
         // フォーカスが当たっている行が無ければ終了
-        if (standardTableRow == null || currentTableRowIndex == null) {
+        if (standardTableRow == null || currentTableRow == null) {
             return
         }
         // standardTableRow
@@ -230,7 +226,7 @@ class FocusManager {
         // standardTableRow
         // の場合
         else {
-            this.#unFocus(currentTableRowIndex)
+            this.#unFocus(currentTableRow)
         }
 
         // スクロール位置を調整
@@ -246,9 +242,9 @@ class FocusManager {
             return
         }
         const standardTableRow = this.#getStandardTableRow()
-        const currentTableRowIndex = this.#getCurrentTableRowIndex()
+        const currentTableRow = this.#getCurrentTableRow()
         // フォーカスが当たっている行が無ければ終了
-        if (standardTableRow == null || currentTableRowIndex == null) {
+        if (standardTableRow == null || currentTableRow == null) {
             return
         }
         // previousTableRow
@@ -261,7 +257,7 @@ class FocusManager {
         // previousTableRow
         // の場合
         else {
-            this.#unFocus(currentTableRowIndex)
+            this.#unFocus(currentTableRow)
         }
 
         // スクロール位置を調整
