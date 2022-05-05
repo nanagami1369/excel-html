@@ -554,23 +554,8 @@ const setup = (): void => {
     document.addEventListener(
         'keydown',
         (e) => {
-            if (e.ctrlKey) {
-                switch (e.key) {
-                    case '0':
-                        fontSize.zoomReset()
-                        e.preventDefault()
-                        break
-                    case '-':
-                        fontSize.zoomOut()
-                        e.preventDefault()
-                    case '=':
-                    case ';':
-                        fontSize.zoomIn()
-                        e.preventDefault()
-                        break
-                    default:
-                        break
-                }
+            if (e.ctrlKey && e.key === '0') {
+                fontSize.zoomReset()
             }
         },
         { passive: false }
