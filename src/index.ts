@@ -20,6 +20,14 @@ class SelectMouseRange {
         this.value.splice(0)
     }
 
+    getStandard(): HTMLTableRowElement | null {
+        if (this.value.length === 0) {
+            return null
+        } else {
+            return this.value[0]
+        }
+    }
+
     getCurrent(): HTMLTableRowElement | null {
         if (this.value.length === 0) {
             return null
@@ -339,8 +347,12 @@ class FocusManager {
                 const standardTableRow = target
                 selectRange.select(standardTableRow)
 
-                // マウスによるフォーカスの判定が始まった時点で前回のフォーカスは解除
-                this.#unFocusAll()
+                if (event.ctrlKey) {
+                    // コントロールキーが押されていたら複数フォーカスとする
+                } else {
+                    // 単体フォーカス時は、マウスによるフォーカスの判定が始まった時点で前回のフォーカスは解除
+                    this.#unFocusAll()
+                }
 
                 // 初期値と現在のマウスの位置から現在選択されているテーブルの範囲を判定する関数
                 const selectingMouseRangeTableRow = () => {
@@ -432,11 +444,37 @@ class FocusManager {
                 const mouseMovePoolingId = setInterval(selectingMouseRangeTableRow, 50)
                 const focusMouseRangeTableRow = (event: Event) => {
                     event.preventDefault()
+                    // マウス範囲選択中の処理を停止
                     clearInterval(mouseMovePoolingId)
                     mousePosition.Dispose()
                     document.removeEventListener('mouseup', focusMouseRangeTableRow)
-                    // 選択範囲をフォーカスする
-                    selectRange.value.forEach((tableRow) => this.#focus(tableRow))
+                    // 基準位置がすでにフォーカスが当たっていたら
+                    const standard = selectRange.getStandard()
+                    const isStandardAlreadyFocus =
+                        standard?.classList.contains(this.#FocusTableRowClassName) ?? false
+                    if (isStandardAlreadyFocus) {
+                        // 選択範囲をフォーカス解除
+                        // ※ focusとunFocusでやると辛かったので直接テーブルを書き換えて再取得する
+                        selectRange.value.forEach((tableRow) =>
+                            tableRow.classList.remove(this.#FocusTableRowClassName)
+                        )
+                        const focusTableRows = document.querySelectorAll<HTMLTableRowElement>(
+                            `tr.${this.#FocusTableRowClassName}`
+                        )
+                        this.#unFocusAll()
+                        focusTableRows.forEach((tableRow) => this.#focus(tableRow))
+                    } else {
+                        // 選択範囲をフォーカス
+                        // ※ focusとunFocusでやると辛かったので直接テーブルを書き換えて再取得する
+                        selectRange.value.forEach((tableRow) =>
+                            tableRow.classList.add(this.#FocusTableRowClassName)
+                        )
+                        const focusTableRows = document.querySelectorAll<HTMLTableRowElement>(
+                            `tr.${this.#FocusTableRowClassName}`
+                        )
+                        this.#unFocusAll()
+                        focusTableRows.forEach((tableRow) => this.#focus(tableRow))
+                    }
                     selectRange.unSelectAll()
                 }
                 document.addEventListener('mouseup', focusMouseRangeTableRow, {
